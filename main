@@ -165,7 +165,7 @@ void oyunuOynat() {
         scanf(" %c", &eylem);
 
         if (eylem == 'H' || eylem == 'Y' || eylem == 'h' || eylem == 'y') {
-            printf("Lutfen bir yon girin (Kuzey <K>, Guney <G>, Dogu <D>, Bati <B>): ");
+            printf("Lutfen bir yon girin (Kuzey <K,k>, Guney <G,g>, Dogu <D,d>, Bati <B,b>): ");
             char yon;
             scanf(" %c", &yon);
 
@@ -182,8 +182,20 @@ void oyunuOynat() {
                 case 'B':
                     yon = BATI;
                     break;
+                case 'k':
+                    yon = KUZEY;
+                    break;
+                case 'g':
+                    yon = GUNEY;
+                    break;
+                case 'd':
+                    yon = DOGU;
+                    break;
+                case 'b':
+                    yon = BATI;
+                    break;
                 default:
-                    printf("Gecersiz yon! Lutfen K, G, D veya B girin.\n");
+                    printf("Gecersiz yon! Lutfen K,k,G,g,D,d,B,b inputlarindan birini girin.\n");
                     continue;
             }
 
