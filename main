@@ -1,0 +1,236 @@
+// Hasan Tatar , Y23LBIM801 , Project2
+// her türlü yazım hatası için özür dilerim.
+// https://github.com/wazder/TortoiseOyunu
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-msc51-cpp"
+#pragma ide diagnostic ignored "cert-msc50-cpp"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+enum Eylem { HAREKET __attribute__((unused)), YEMEK __attribute__((unused)) };
+enum Yon { KUZEY, GUNEY, DOGU, BATI };
+
+#define MAKS_TAHTA_BOYUTU 4
+#define BASLANGIC_ENERJI 20
+#define HAREKET_ENERJI_MALIYETI 1
+#define YEMEK_ENERJI_KAZANCI 10
+
+char tahta[MAKS_TAHTA_BOYUTU][MAKS_TAHTA_BOYUTU];
+int kaplumbagaSatir, kaplumbagaSutun, enerjiSeviye;
+int tahtaBoyutu = MAKS_TAHTA_BOYUTU;
+
+void tahtayiBaslat() {
+    int i, j;
+    for (i = 0; i < tahtaBoyutu; i++) {
+        for (j = 0; j < tahtaBoyutu; j++) {
+            tahta[i][j] = '_';
+        }
+    }
+}
+
+void kaplumbagaYerlestir() {
+    srand(time(NULL));
+    kaplumbagaSatir = rand() % tahtaBoyutu;
+    kaplumbagaSutun = rand() % tahtaBoyutu;
+    tahta[kaplumbagaSatir][kaplumbagaSutun] = '@';
+}
+
+void yemiYerlestir() {
+    int yemSayisi = (int)(0.15 * tahtaBoyutu * tahtaBoyutu);
+    int i, satir, sutun;
+    for (i = 0; i < yemSayisi; i++) {
+        do {
+            satir = rand() % tahtaBoyutu;
+            sutun = rand() % tahtaBoyutu;
+        } while (tahta[satir][sutun] != '_');
+        tahta[satir][sutun] = '*';
+    }
+}
+
+void cukuruYerlestir() {
+    int cukurSayisi = (int)(0.5 * tahtaBoyutu * tahtaBoyutu);
+    int i, satir, sutun;
+    for (i = 0; i < cukurSayisi; i++) {
+        do {
+            satir = rand() % tahtaBoyutu;
+            sutun = rand() % tahtaBoyutu;
+        } while (tahta[satir][sutun] != '_');
+        tahta[satir][sutun] = 'O';
+    }
+}
+
+void tahtayiYazdir() {
+    int i, j;
+    printf("=====================\n");
+    for (i = 0; i < tahtaBoyutu; i++) {
+        for (j = 0; j < tahtaBoyutu; j++) {
+            printf("%c ", tahta[i][j]);
+        }
+        printf("\n");
+    }
+    printf("=====================\n");
+}
+
+void kaplumbagayiHareketEttir(enum Yon yon) {
+    int yeniSatir = kaplumbagaSatir, yeniSutun = kaplumbagaSutun;
+    switch (yon) {
+        case KUZEY:
+            yeniSatir--;
+            break;
+        case GUNEY:
+            yeniSatir++;
+            break;
+        case DOGU:
+            yeniSutun++;
+            break;
+        case BATI:
+            yeniSutun--;
+            break;
+    }
+
+    if (yeniSatir >= 0 && yeniSatir < tahtaBoyutu && yeniSutun >= 0 && yeniSutun < tahtaBoyutu) {
+        enerjiSeviye -= HAREKET_ENERJI_MALIYETI;
+        if (tahta[yeniSatir][yeniSutun] == '*') {
+            enerjiSeviye += YEMEK_ENERJI_KAZANCI;
+            tahta[yeniSatir][yeniSutun] = '_';
+        } else if (tahta[yeniSatir][yeniSutun] == 'O') {
+            printf("Oyun Bitti! Kaplumbaga cukura dustu.\n");
+            exit(0);
+        }
+
+        tahta[kaplumbagaSatir][kaplumbagaSutun] = '_';
+        kaplumbagaSatir = yeniSatir;
+        kaplumbagaSutun = yeniSutun;
+        tahta[kaplumbagaSatir][kaplumbagaSutun] = '@';
+    }
+}
+
+void yemiYe(enum Yon yon) {
+    int yeniSatir = kaplumbagaSatir, yeniSutun = kaplumbagaSutun;
+    switch (yon) {
+        case KUZEY:
+            yeniSatir--;
+            break;
+        case GUNEY:
+            yeniSatir++;
+            break;
+        case DOGU:
+            yeniSutun++;
+            break;
+        case BATI:
+            yeniSutun--;
+            break;
+    }
+
+    if (yeniSatir >= 0 && yeniSatir < tahtaBoyutu && yeniSutun >= 0 && yeniSutun < tahtaBoyutu &&
+        tahta[yeniSatir][yeniSutun] == '*') {
+        enerjiSeviye += YEMEK_ENERJI_KAZANCI;
+        tahta[yeniSatir][yeniSutun] = '_';
+        tahtayiYazdir();
+    }
+}
+
+void oyunuOynat() {
+    char eylem;
+    enum Yon;
+
+    tahtayiBaslat();
+    kaplumbagaYerlestir();
+    yemiYerlestir();
+    cukuruYerlestir();
+
+    enerjiSeviye = BASLANGIC_ENERJI;
+
+    printf("# Oyunun temel kurallari : \n");
+    printf("1. Kaplumbaga enerjisi 0'a duserse oyun biter.\n");
+    printf("2. Tum yemleri yerseniz oyunu kazanirsiniz.\n");
+    printf("3. Kaplumbaga cukura duserse oyun biter.\n");
+    printf("4. Kaplumbaga tahtanin disina cikarsa oyun biter.\n");
+    printf("5. Kaplumbaga yem yediginde enerjisi artar.\n");
+    printf("6. Kaplumbaga her hareket ettiginde enerjisi azalir.\n");
+    printf("\n");
+    printf("Sembollerin anlamlari : \n");
+    printf("@ : Kaplumbaga\n");
+    printf("* : Yem\n");
+    printf("O : Cukur\n");
+    printf("_ : Bos\n");
+    printf("\n");
+
+    while (1) {
+        tahtayiYazdir();
+        printf("Enerji Seviyesi: %d\n", enerjiSeviye);
+
+        printf("Lutfen bir eylem girin (Hareket <H,h>, Yemek <Y,y>): ");
+        scanf(" %c", &eylem);
+
+        if (eylem == 'H' || eylem == 'Y' || eylem == 'h' || eylem == 'y') {
+            printf("Lutfen bir yon girin (Kuzey <K>, Guney <G>, Dogu <D>, Bati <B>): ");
+            char yon;
+            scanf(" %c", &yon);
+
+            switch (yon) {
+                case 'K':
+                    yon = KUZEY;
+                    break;
+                case 'G':
+                    yon = GUNEY;
+                    break;
+                case 'D':
+                    yon = DOGU;
+                    break;
+                case 'B':
+                    yon = BATI;
+                    break;
+                default:
+                    printf("Gecersiz yon! Lutfen K, G, D veya B girin.\n");
+                    continue;
+            }
+
+            if (eylem == 'H' || eylem == 'h') {
+                kaplumbagayiHareketEttir(yon);
+            } else {
+                yemiYe(yon);
+            }
+        } else {
+            printf("Gecersiz eylem! Lutfen H veya Y girin.\n");
+        }
+
+        if (enerjiSeviye <= 0) {
+            printf("Oyun Bitti! Kaplumbaganin enerjisi tukendi.\n");
+            break;
+        }
+
+        int yemSayisi = 0;
+        for (int i = 0; i < tahtaBoyutu; i++) {
+            for (int j = 0; j < tahtaBoyutu; j++) {
+                if (tahta[i][j] == '*') {
+                    yemSayisi++;
+                }
+            }
+        }
+
+        if (yemSayisi == 0) {
+            printf("Tebrikler, kazandiniz!\n");
+            break;
+        }
+        printf("=====================================\n ");
+    }
+}
+
+int main() {
+    if (tahtaBoyutu != MAKS_TAHTA_BOYUTU) {
+        printf("Gecersiz tahta boyutu. Cikiliyor.\n");
+        return 1;
+    } else {
+        printf("Tortoise Oyununa Hos Geldiniz.\n");
+        printf("Oyunu baslatmak icin iki kere ENTER tusuna basiniz.\n");
+        scanf("%*c");
+        if (getchar() != 'S') {
+            oyunuOynat();
+        }
+    }
+    return 0;
+}
+
+#pragma clang diagnostic pop
